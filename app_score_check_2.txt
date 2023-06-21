@@ -1,0 +1,17 @@
+with a as
+(
+select /*+ parallel(16) */   t.cqueuestate_name, t.cdapddecisionresult_num, t.portfolio_num,
+t.cdaappscore_nval, t.cdaapprove_ind, t.td_ind, t.FINALAPPROVE_IND, trunc(t.system_open_dt) as dt, trunc(t.system_open_dt, 'mm') as mm
+--,t.*
+from app.dim_final_decision t
+where 1=1
+--and t.application_num  = 2239809599 or
+and t.cqueuestate_name like '17%'
+and  (t.cdaappscore_nval is null or t.td_ind is null or t.td_ind =0)
+and trunc(t.system_open_dt) > trunc(sysdate)-360
+and t.dwh_src_key = 3
+and t.portfolio_num <> 8
+)
+select  dt, portfolio_num, count(*)
+from a
+group by dt, portfolio_num
