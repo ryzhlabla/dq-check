@@ -1,0 +1,17 @@
+with a as
+(
+ 
+  select trunc(ad.rcldatercvdsys) as dt ,
+   case when ad.cdascore is not null then 1 else 0 end flag_score
+      ,ad.finalapprove
+      ,case when ad.decdclncode in ('830','754','240') and ad.cdascore is null then 1 else 0 end flag_decline_code
+      ,sum(td) cnt_app
+from risk_appl.application_d ad
+where 1=1
+      and ad.portfolio_id = 5
+      and trunc(ad.rcldatercvdsys) between to_date('20230601','yyyymmdd') and  to_date('20230620','yyyymmdd')
+group by trunc(ad.rcldatercvdsys) , case when ad.cdascore is not null then 1 else 0 end
+      ,ad.finalapprove     
+      ,case when ad.decdclncode in ('830','754','240') and ad.cdascore is null then 1 else 0 end
+)
+select * from a where flag_score = 0 and finalapprove = 1 and flag_decline_code = 0 order by dt
